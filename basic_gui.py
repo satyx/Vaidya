@@ -38,6 +38,7 @@ def myCommand1():
         User_Array[5] = var6.get()
     print(User_Array)
 
+
     # User_Array is an array which consists of intensities of all common symptoms given by the user
 
     user_input = User_Array
@@ -50,7 +51,9 @@ def myCommand1():
             user_output_array[i] = "medium"
         elif user_input[i] in range(7, 11):
             user_output_array[i] = "high"
+    print("User input array :- \n")
     print(user_output_array)
+    print('\n')
     # User_Output_Array is a changed form of user array (changing crisp intensities to fuzzy(low,medium,high) for each common symptom)
 
     # Rule Base
@@ -70,8 +73,8 @@ def myCommand1():
     # will help in passing them all inside a loop ...
     diseases = [d1, d2, d3, d4, d5, d6, d7, d8, d9, d10, d11]
 
-    print("The disease rule base is:")
-    print(diseases)
+    #print("\n\nThe disease rule base is:\n")
+    #print(diseases)
 
     fever = {'very_low': np.array([0, 0, 0.5]), 'low': np.array(
         [0, 0.5, 5]), 'medium': np.array([0, 5, 10]), 'high': np.array([5, 10, 10])}
@@ -99,8 +102,9 @@ def myCommand1():
         tmp = [x/len(d) for x in tmp]
         list_of_templates.append(tmp)
 
+    print('\nThese are the list of constant templates for each disease\n')
     print(list_of_templates)
-
+    print("\n")
     # Making 11 dictionaries for data given by the user
 
     U1 = {1: "very_low", 2: "very_low",
@@ -123,8 +127,8 @@ def myCommand1():
         for i in U.keys():
             U[i] = user_output_array[i-1]
 
-    print("The dictionaries made from the user data is")
-    print(user)
+    #print("\n\nThe dictionaries made from the user data is")
+    #print(user)
 
     # Making user templates
     user_template = []
@@ -136,8 +140,61 @@ def myCommand1():
         tmp = [x/len(U) for x in tmp]
         user_template.append(tmp)
 
+    print("\nUser templates for each diseases\n")
     print(user_template)
 
+    # return the values of y corresponding to each value of x ...
+    def y_points(x_y,x):
+        y_pt= np.zeros(len(x))
+        for index,pt in enumerate(x):
+            y=0
+            if pt>x_y[0][0] and pt<x_y[1][0]:
+                y = (x_y[1][1]-x_y[0][1])*(pt-x_y[0][0])/(x_y[1][0]-x_y[0][0])
+                y_pt[index]=y
+            elif pt>=x_y[1][0] and pt<x_y[2][0]:
+                y = (x_y[1][1]-x_y[2][1])*(pt-x_y[1][0])/(x_y[2][0]-x_y[1][0])
+                y_pt[index]=y
+            else:
+                y_pt[index]=y
+        return y_pt
+
+    # returns the correlation value of two templates ....
+    def corr(disease_templ,user_templ,step = 0.1):
+        x_min = min(disease_templ[0][0],user_templ[0][0])
+        x_max = max(disease_templ[2][0],user_templ[2][0])
+        x = np.arange(x_min,x_max,step)
+        #x = np.linspace (0,10,101)                             // will give the all values of x .....
+        y_disease = y_points(disease_templ,x)
+        y_user = y_points(user_templ,x)
+        correlation = y_disease*y_user
+        return np.sum(correlation)
+
+    # Correlation corresponding to each disease in a dictionary where the keys represents diseases...
+    correlation_dict = {i+1:0 for i in range(len(diseases))}
+
+    # Correlation values are rounded off to nearest integer ...
+    for i in range(len(diseases)):
+        disease_t = [[ list_of_templates[i][0],0 ], [ list_of_templates[i][1],1 ], [ list_of_templates[i][2],0 ]]
+        user_t = [[ user_template[i][0],0 ], [ user_template[i][1],1 ], [ user_template[i][2],0 ]]
+        correlation_dict[i+1] = round(corr(disease_t,user_t))
+
+    print ('\n')
+    print (correlation_dict)
+
+    tmp = [correlation_dict[i+1] for i in range(len(correlation_dict))]
+    shortlisted_diseases = []
+
+    # As we want to shorlist atleast 3 diseases .....
+    for i in range(3):
+        lst = [index for (index, value) in correlation_dict.items() if value == max(tmp)]
+        for k in lst:
+            tmp[k-1] = 0
+        shortlisted_diseases = shortlisted_diseases + lst
+
+    print('\n')
+
+    # This list will finally provide the list of probable diseases ....
+    print(shortlisted_diseases)
 
 top = Tk()
 CheckVar1 = IntVar()
