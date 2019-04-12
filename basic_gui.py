@@ -41,19 +41,24 @@ def myCommand1():
 
     # User_Array is an array which consists of intensities of all common symptoms given by the user
 
+    No_of_user_symptoms = 0
     user_input = User_Array
-    user_output_array = ["very_low", "very_low",
-                         "very_low", "very_low", "very_low", "very_low"]
+    user_output_array = ["very_low", "very_low", "very_low", "very_low", "very_low", "very_low"]
     for i in range(0, 6):
         if user_input[i] in range(1, 4):
+            No_of_user_symptoms = No_of_user_symptoms + 1
             user_output_array[i] = "low"
         elif user_input[i] in range(4, 7):
+            No_of_user_symptoms = No_of_user_symptoms + 1
             user_output_array[i] = "medium"
         elif user_input[i] in range(7, 11):
+            No_of_user_symptoms = No_of_user_symptoms + 1
             user_output_array[i] = "high"
     print("User input array :- \n")
     print(user_output_array)
     print('\n')
+
+
     # User_Output_Array is a changed form of user array (changing crisp intensities to fuzzy(low,medium,high) for each common symptom)
 
     # Rule Base
@@ -72,6 +77,9 @@ def myCommand1():
     # Making all rule base templates
     # will help in passing them all inside a loop ...
     diseases = [d1, d2, d3, d4, d5, d6, d7, d8, d9, d10, d11]
+
+    # Give you the number of common symptoms in our rule base for each disease ....
+    No_of_common_symptoms = [ len(diseases[i]) for i in range(11) ]
 
     #print("\n\nThe disease rule base is:\n")
     #print(diseases)
@@ -102,9 +110,9 @@ def myCommand1():
         tmp = [x/len(d) for x in tmp]
         list_of_templates.append(tmp)
 
-    print('\nThese are the list of constant templates for each disease\n')
-    print(list_of_templates)
-    print("\n")
+    #print('\nThese are the list of constant templates for each disease\n')
+    #print(list_of_templates)
+    #print("\n")
     # Making 11 dictionaries for data given by the user
 
     U1 = {1: "very_low", 2: "very_low",
@@ -140,8 +148,8 @@ def myCommand1():
         tmp = [x/len(U) for x in tmp]
         user_template.append(tmp)
 
-    print("\nUser templates for each diseases\n")
-    print(user_template)
+    #print("\nUser templates for each diseases\n")
+    #print(user_template)
 
     # return the values of y corresponding to each value of x ...
     def y_points(x_y,x):
@@ -178,8 +186,8 @@ def myCommand1():
         user_t = [[ user_template[i][0],0 ], [ user_template[i][1],1 ], [ user_template[i][2],0 ]]
         correlation_dict[i+1] = round(corr(disease_t,user_t))
 
-    print ('\n')
-    print (correlation_dict)
+    #print ('\n')
+    #print (correlation_dict)
 
     tmp = [correlation_dict[i+1] for i in range(len(correlation_dict))]
     shortlisted_diseases = []
@@ -194,7 +202,22 @@ def myCommand1():
     print('\n')
 
     # This list will finally provide the list of probable diseases ....
+    final_shortlisted_diseases = []
+    #print("User_symptoms .... ")
+    #print (No_of_user_symptoms)
+    #print("Common symptoms number ...")
+    #print (No_of_common_symptoms)
+    print ('\n')
+    if(No_of_user_symptoms >= 4):
+        for i in range(len(shortlisted_diseases)):
+            #print(No_of_common_symptoms[shortlisted_diseases[i]-1])
+            if( No_of_user_symptoms - No_of_common_symptoms[shortlisted_diseases[i]-1] <= 2 ):
+                #print('\n')
+                final_shortlisted_diseases.append(shortlisted_diseases[i])
+
     print(shortlisted_diseases)
+    print('modified_shortlisting ....')
+    print(final_shortlisted_diseases)
 
 top = Tk()
 CheckVar1 = IntVar()
