@@ -214,6 +214,8 @@ def myCommand1():
             if( No_of_user_symptoms - No_of_common_symptoms[shortlisted_diseases[i]-1] <= 2 ):
                 #print('\n')
                 final_shortlisted_diseases.append(shortlisted_diseases[i])
+    else:
+        final_shortlisted_diseases = final_shortlisted_diseases+shortlisted_diseases
 
     print(shortlisted_diseases)
     print('modified_shortlisting ....')
